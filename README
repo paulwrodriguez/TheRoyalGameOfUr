@@ -1,0 +1,14 @@
+The Royal Game of UR
+
+Program that simulates the game
+
+Parts
+* Board (3 x 8)
+* Player
+* Pieces
+* Spaces
+* Dice
+
+TODO
+Role the dice
+Player movies a piece
