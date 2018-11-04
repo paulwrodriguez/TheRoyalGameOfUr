@@ -20,15 +20,15 @@ public class UrGame {
         return scanner.next();
     }
 
-    public void play() {
+    public void play() throws Exception {
 
-
-        String cmd = prompt();
-        while(cmd.equalsIgnoreCase("Y")){
-            printBoard();
+        printBoard();
+        while( !board.isGameOver() ) {
             int diceRoll = rollDice();
+            board.printPlayerPoints();
             board.playerMove(diceRoll);
-            cmd = prompt();
+            board.nextPlayer();
+            printBoard();
         }
 
     }

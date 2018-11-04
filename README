@@ -10,9 +10,13 @@ Parts
 * Dice
 
 TODO
-Role the dice
-Player movies a piece
+* add special spaces
+* add output that shows that you ate someones piece.
+* remove prompt to continue playing. exit on winner
 
+Features
+* add 'you have pieces on' after which piece do you want to move prompt.
+* add second player
 
 Board Key
 (x,y)
