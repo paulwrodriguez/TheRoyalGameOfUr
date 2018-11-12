@@ -1,7 +1,6 @@
 package com.company.paul;
 
-import java.util.Collections;
-import java.util.Scanner;
+import java.util.*;
 
 public class Board {
     int[][] board;
@@ -13,6 +12,7 @@ public class Board {
     Cord END = new Cord(-2, -2);
     private int playerOnePoints = 0;
     private int playerTwoPoints = 0;
+    Scanner scanner = new Scanner(System.in);
 
     public Board() {
         board = new int[8][3];
@@ -26,7 +26,15 @@ public class Board {
         playerOne = !playerOne;
     }
 
-
+    List<String> solution = Arrays.asList(
+            "|0,0 |0,1 |0,2 |",
+            "|1,0 |1,1 |1,2 |",
+            "|2,0 |2,1 |2,2 |",
+            "|3,0 |3,1 |3,2 |",
+            "       |4,1 |     ",
+            "       |5,1 |     ",
+            "|6,0 |6,1 |6,2 |",
+            "|7,0 |7,1 |7,2 |");
     public void printBoard() {
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
@@ -49,15 +57,16 @@ public class Board {
                 }
             }
             if (board[i][2] == -1) {
-                System.out.println("");
+                System.out.print("");
             } else {
-                System.out.println("| ");
+                System.out.print("| ");
             }
+
+            System.out.println("       " + solution.get(i));
 
         }
     }
 
-    Scanner scanner = new Scanner(System.in);
 
     public void playerMove(int diceRoll) throws Exception {
         /*
@@ -66,19 +75,42 @@ public class Board {
          *   home
          *   board
          */
-        System.out.println("You rolled a " + diceRoll + ". Move home(h) or move piece(p)");
-        String choice = scanner.next();
-        if (choice.equalsIgnoreCase("h")) {
-            // home
-            updateBoard(HOME, diceRoll);
-        } else if (choice.equalsIgnoreCase("p")) {
-            // move previous piece
-            System.out.println("Which piece do you want to move? {x y}");
-            System.out.println("You have peices on " + getListOfActivePieces());
-            int x = scanner.nextInt();
-            int y = scanner.nextInt();
-            Cord piece = new Cord(x, y);
-            updateBoard(piece, diceRoll);
+        boolean valid = false;
+
+        choose:
+        while (!valid) {
+            System.out.println("Player (" + getCurrentPlayerSymbol(playerOne) + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
+            String choice = scanner.next();
+            if (choice.equalsIgnoreCase("h")) {
+                // home
+                Cord futureMoveLocation = fetechNextSpace(HOME, diceRoll);
+                if (!futureMoveLocation.equals(HOME) && board[futureMoveLocation.x][futureMoveLocation.y] == getCurrentPlayerSymbol(playerOne)) {
+                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " already has a piece on " + futureMoveLocation.x + " " + futureMoveLocation.y + ".");
+                    System.out.println("Please choose another move.");
+                    continue choose;
+                } else {
+                    valid = true;
+                }
+                updateBoard(HOME, diceRoll);
+            } else if (choice.equalsIgnoreCase("p")) {
+                // move previous piece
+                System.out.println("Which piece do you want to move? {x y}");
+                System.out.println("You have peices on " + getListOfActivePieces());
+                int x = scanner.nextInt();
+                int y = scanner.nextInt();
+                Cord piece = new Cord(x, y);
+
+                Cord futureMove = fetechNextSpace(piece, diceRoll);
+                if (board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(playerOne)) {
+                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " already has a piece on " + futureMove.x + " " + futureMove.y + ". ");
+                    System.out.println("Please choose another move.");
+                    continue choose;
+                } else {
+                    valid = true;
+                }
+                updateBoard(piece, diceRoll);
+            }
+
         }
 
     }
@@ -98,7 +130,7 @@ public class Board {
     }
 
     public boolean isGameOver() {
-        if(playerOnePoints >= 7 || playerTwoPoints >= 7)
+        if (playerOnePoints >= 7 || playerTwoPoints >= 7)
             return true;
         else
             return false;
@@ -114,6 +146,11 @@ public class Board {
         }
 
         public Cord() {
+        }
+
+        public Cord(Cord cord) {
+            this.x = cord.x;
+            this.y = cord.y;
         }
 
         ;
@@ -218,13 +255,11 @@ public class Board {
                 cur.set(6, 2);
             } else if (cur.x == 6 && cur.y == 2) {
                 cur.set(END.x, END.y);
-            }
-            else {
+            } else {
                 throw new Exception("You are not allowed to move past home. cur=" + cur.toString());
             }
-        }
-        else {
-            throw new Exception("nextSpace else case encountered: playerOne = " + playerOne );
+        } else {
+            throw new Exception("nextSpace else case encountered: playerOne = " + playerOne);
         }
     }
 
@@ -236,16 +271,22 @@ public class Board {
         }
     }
 
+    public Cord fetechNextSpace(Cord cord, int diceRoll) throws Exception {
+        Cord moveTo = new Cord(cord);
+        for (int i = 0; i < diceRoll; ++i) {
+            nextSpace(moveTo);
+        }
+
+        return moveTo;
+    }
+
     public void updateBoard(Cord cord, int diceRoll) throws Exception {
         if (diceRoll == 0) {
             return;
         }
         if (cord.equals(HOME)) {
             // evaluate solution coordinate
-            Cord moveTo = new Cord(HOME.x, HOME.y);
-            for (int i = 0; i < diceRoll; ++i) {
-                nextSpace(moveTo);
-            }
+            Cord moveTo = fetechNextSpace(cord, diceRoll);
             board[moveTo.x][moveTo.y] = getCurrentPlayerSymbol(playerOne);
         } else {
             // move a piece that already exist
@@ -261,18 +302,18 @@ public class Board {
         }
     }
 
-    public void printPlayerPoints(){
+    public void printPlayerPoints() {
         System.out.println("Player 1: " + playerOnePoints);
         System.out.println("Player 2: " + playerTwoPoints);
     }
+
     private void promptHome() {
-        if(playerOne){
+        if (playerOne) {
             ++playerOnePoints;
-        }
-        else {
+        } else {
             ++playerTwoPoints;
         }
-        System.out.println( getCurrentPlayerSymbol(playerOne) + " made a piece home !");
+        System.out.println(getCurrentPlayerSymbol(playerOne) + " made a piece home !");
     }
 
     private boolean isHome(Cord moveTo) {
