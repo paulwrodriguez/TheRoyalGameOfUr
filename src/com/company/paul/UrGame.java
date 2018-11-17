@@ -28,7 +28,11 @@ public class UrGame {
             board.nextPlayer();
             printBoard();
         }
+        printWinner();
+    }
 
+    private void printWinner(){
+        System.out.println("The winner is " + board.getWinner() + "!!!!!");
     }
 
     public int rollDice(){

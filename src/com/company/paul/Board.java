@@ -16,8 +16,8 @@ public class Board {
     private int playerOnePoints = 0;
     private int playerTwoPoints = 0;
     Scanner scanner = new Scanner(System.in);
-    private static final int WINPOINTS = 1;
-    public final Cord ERROR = new Cord(-1, -1);
+    private static final int WINPOINTS = 2;
+    public final Cord ERROR = new Cord(-3, -3);
 
     public Board() {
         board = new int[8][3];
@@ -80,10 +80,8 @@ public class Board {
          *   home
          *   board
          */
-        boolean valid = false;
-
-        choose:
-        while (!valid) {
+        Cord piece = null;
+        while (true) {
             System.out.println("Player (" + getCurrentPlayerSymbol(playerOne) + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
             String choice = scanner.next();
             if (choice.equalsIgnoreCase("h")) {
@@ -92,42 +90,48 @@ public class Board {
                 if (!futureMoveLocation.equals(HOME) && board[futureMoveLocation.x][futureMoveLocation.y] == getCurrentPlayerSymbol(playerOne)) {
                     System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " already has a piece on " + futureMoveLocation.x + " " + futureMoveLocation.y + ".");
                     System.out.println("Please choose another move.");
-                    continue choose;
                 } else {
-                    valid = true;
+                    piece = HOME;
+                    break;
                 }
-                updateBoard(HOME, diceRoll);
+
             } else if (choice.equalsIgnoreCase("p")) {
                 // move previous piece
                 System.out.println("Which piece do you want to move? {x y}");
                 System.out.println("You have peices on " + getListOfActivePieces());
                 int x = scanner.nextInt();
                 int y = scanner.nextInt();
-                Cord piece = new Cord(x, y);
+                Cord tempPiece = new Cord(x, y);
 
-                Cord futureMove = fetechNextSpace(piece, diceRoll);
+                Cord futureMove = fetechNextSpace(tempPiece, diceRoll);
                 if (!validMove(futureMove)) {
-                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " is not allowed to move from " + piece + " to " + futureMove);
+                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " is not allowed to move from " + tempPiece + " to " + futureMove);
                     System.out.println("Please choose another move.");
-                    continue choose;
                 } else {
-                    valid = true;
+                    piece = tempPiece;
+                    break;
                 }
-                updateBoard(piece, diceRoll);
             }
 
         }
+        updateBoard(piece, diceRoll);
 
     }
 
     private boolean validMove(Cord futureMove) {
 
-        if (futureMove.equals(ERROR)) {
-            return false;
-        } else if (board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(playerOne)) {
+        if( futureMove.equals(END)){
+            return true;
+        }
+        else if (futureMove.equals(ERROR)) {
             return false;
         }
-        return true;
+        else if (board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(playerOne)) {
+            return false;
+        } else {
+            return true;
+        }
+
     }
 
     private String getListOfActivePieces() {
@@ -149,6 +153,14 @@ public class Board {
             return true;
         else
             return false;
+    }
+
+    public String getWinner(){
+        if(playerOnePoints >= WINPOINTS){
+            return "1";
+        }else {
+            return "2";
+        }
     }
 
     private class Cord {
@@ -315,8 +327,9 @@ public class Board {
             }
             if (isHome(moveTo)) {
                 promptHome();
+            } else {
+                board[moveTo.x][moveTo.y] = getCurrentPlayerSymbol(playerOne);
             }
-            board[moveTo.x][moveTo.y] = getCurrentPlayerSymbol(playerOne);
             board[cord.x][cord.y] = EMPTYSPACE;
         }
     }
