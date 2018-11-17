@@ -3,6 +3,7 @@ package com.company.paul;
 import java.util.*;
 
 public class Board {
+
     int[][] board;
     boolean playerOne = true;
     char playerOneSymbol = 'X';
@@ -10,9 +11,13 @@ public class Board {
     final int EMPTYSPACE = 0;
     Cord HOME = new Cord(-1, -1);
     Cord END = new Cord(-2, -2);
+    Cord LASTSPACEPLAYERONE = new Cord(6, 0);
+    Cord LASTSPACEPLAYERTWO = new Cord(6, 2);
     private int playerOnePoints = 0;
     private int playerTwoPoints = 0;
     Scanner scanner = new Scanner(System.in);
+    private static final int WINPOINTS = 1;
+    public final Cord ERROR = new Cord(-1, -1);
 
     public Board() {
         board = new int[8][3];
@@ -35,6 +40,7 @@ public class Board {
             "       |5,1 |     ",
             "|6,0 |6,1 |6,2 |",
             "|7,0 |7,1 |7,2 |");
+
     public void printBoard() {
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
@@ -66,7 +72,6 @@ public class Board {
 
         }
     }
-
 
     public void playerMove(int diceRoll) throws Exception {
         /*
@@ -101,8 +106,8 @@ public class Board {
                 Cord piece = new Cord(x, y);
 
                 Cord futureMove = fetechNextSpace(piece, diceRoll);
-                if (board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(playerOne)) {
-                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " already has a piece on " + futureMove.x + " " + futureMove.y + ". ");
+                if (!validMove(futureMove)) {
+                    System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " is not allowed to move from " + piece + " to " + futureMove);
                     System.out.println("Please choose another move.");
                     continue choose;
                 } else {
@@ -113,6 +118,16 @@ public class Board {
 
         }
 
+    }
+
+    private boolean validMove(Cord futureMove) {
+
+        if (futureMove.equals(ERROR)) {
+            return false;
+        } else if (board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(playerOne)) {
+            return false;
+        }
+        return true;
     }
 
     private String getListOfActivePieces() {
@@ -130,7 +145,7 @@ public class Board {
     }
 
     public boolean isGameOver() {
-        if (playerOnePoints >= 7 || playerTwoPoints >= 7)
+        if (playerOnePoints >= WINPOINTS || playerTwoPoints >= WINPOINTS)
             return true;
         else
             return false;
@@ -271,10 +286,14 @@ public class Board {
         }
     }
 
-    public Cord fetechNextSpace(Cord cord, int diceRoll) throws Exception {
+    public Cord fetechNextSpace(Cord cord, int diceRoll) {
         Cord moveTo = new Cord(cord);
-        for (int i = 0; i < diceRoll; ++i) {
-            nextSpace(moveTo);
+        try {
+            for (int i = 0; i < diceRoll; ++i) {
+                nextSpace(moveTo);
+            }
+        } catch (Exception e) {
+            moveTo = ERROR;
         }
 
         return moveTo;

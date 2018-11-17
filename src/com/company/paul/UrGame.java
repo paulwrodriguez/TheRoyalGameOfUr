@@ -1,7 +1,5 @@
 package com.company.paul;
 
-import javax.swing.plaf.synth.SynthTextAreaUI;
-import java.lang.management.PlatformLoggingMXBean;
 import java.util.Random;
 import java.util.Scanner;
 
