@@ -108,6 +108,9 @@ public class Board {
                     System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " is not allowed to move from " + tempPiece + " to " + futureMove);
                     System.out.println("Please choose another move.");
                 } else {
+                    if(board[futureMove.x][futureMove.y] == getCurrentPlayerSymbol(!playerOne)){
+                        System.out.println("You ate piece " + futureMove);
+                    }
                     piece = tempPiece;
                     break;
                 }
