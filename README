@@ -2,6 +2,9 @@ The Royal Game of UR
 
 Program that simulates the game
 
+Rules:
+    [Variants on game rules](https://www.mastersofgames.com/rules/royal-ur-rules.htm)
+
 Parts
 * Board (3 x 8)
 * Player
@@ -10,11 +13,10 @@ Parts
 * Dice
 
 TODO
+* add money to determine winner? or possibly to not determine winner.
 * add feature to toggle joption pane
 * error check input
 * add number mapping of the spaces 1 - 14
-
-
 
 Features
 * fixed bug where player one home having '|' appended to it
