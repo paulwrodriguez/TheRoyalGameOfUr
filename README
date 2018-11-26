@@ -1,9 +1,10 @@
 The Royal Game of UR
 
-Program that simulates the game
+Game Simulation
 
 Rules:
     https://www.mastersofgames.com/rules/royal-ur-rules.htm
+
 
 Parts
 * Board (3 x 8)
@@ -11,27 +12,6 @@ Parts
 * Pieces
 * Spaces
 * Dice
-
-TODO
-* add money to determine winner? or possibly to not determine winner.
-* add feature to toggle joption pane
-* error check input
-* add number mapping of the spaces 1 - 14
-
-Features
-* fixed bug where player one home having '|' appended to it
-* added joptionpane for game console.
-* add special spaces
-* home should be 4 0 and end should be 5 0 for player one.
-* home should be 4 2 and end should be 5 2 for player two
-* add output that shows that you ate someones piece.
-* updated board interface.
-* add validation for end game. exactly landing on home square
-* add 'you have pieces on' after which piece do you want to move prompt.
-* add second player
-* remove prompt to continue playing. exit on winner
-* add key to board print out
-* add error checking for space
 
 
 Board Key
@@ -60,4 +40,30 @@ Special Squares
     * 6,2
 * Immunity Squares
     * 3,1
+
+Features
+* fixed bug where player one home having '|' appended to it
+* added joptionpane for game console.
+* add special spaces
+* home should be 4 0 and end should be 5 0 for player one.
+* home should be 4 2 and end should be 5 2 for player two
+* add output that shows that you ate someones piece.
+* updated board interface.
+* add validation for end game. exactly landing on home square
+* add 'you have pieces on' after which piece do you want to move prompt.
+* add second player
+* remove prompt to continue playing. exit on winner
+* add key to board print out
+* add error checking for space
+
+
+TODO
+* add money to determine winner? or possibly to not determine winner.
+* add feature to toggle joption pane
+* error check input
+* add number mapping of the spaces 1 - 14
+
+
+
+
 
