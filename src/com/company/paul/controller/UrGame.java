@@ -2,6 +2,8 @@ package com.company.paul.controller;
 
 import com.company.paul.service.Board;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.Scanner;
 
 public class UrGame {
@@ -15,19 +17,21 @@ public class UrGame {
 
     public void play() throws Exception {
 
-        while( !board.isGameOver() ) {
-            board.printBoard();
-            int diceRoll = board.rollDice();
-            board.printPlayerPoints();
-            board.playerMove(diceRoll);
-            board.nextPlayer();
-
-        }
+//        while( !board.isGameOver() ) {
+//            board.printBoard();
+//            int diceRoll = board.rollDice();
+//            board.printPlayerPoints();
+//            board.playerMove(diceRoll);
+//            board.nextPlayer();
+//
+//        }
         printWinner();
     }
 
     private void printWinner(){
-        System.out.println("The winner is " + board.getWinner() + "!!!!!");
+        UIManager.put("OptionPane.messageFont", new Font("Monospaced", Font.PLAIN, 30));
+        JOptionPane.showMessageDialog(null,"The winner is Player " + board.getWinner() + "!!!!!\"");
+//        System.out.println("The winner is " + board.getWinner() + "!!!!!");
     }
 
 }
