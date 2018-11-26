@@ -1,5 +1,6 @@
 package com.company.paul;
 
+
 import java.util.*;
 
 public class Board {
@@ -52,6 +53,16 @@ public class Board {
         HOME = board[4][0];
         END = board[5][0];
 
+        // Special Squares
+        board[0][0].setProperty(Property.ROLLAGAIN);
+        board[6][0].setProperty(Property.ROLLAGAIN);
+        board[0][2].setProperty(Property.ROLLAGAIN);
+        board[6][2].setProperty(Property.ROLLAGAIN);
+        board[3][1].setProperty(Property.ROLLAGAIN);
+        board[3][1].addProperty(Property.IMMUNITY);
+
+
+
 
     }
 
@@ -79,6 +90,7 @@ public class Board {
             "|7,0 |7,1 |7,2 |");
 
     public void printBoard() {
+        System.out.println("-------------------------------------------");
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
                 switch (board[i][j].getOwner()) {
@@ -111,13 +123,10 @@ public class Board {
     }
 
     public Space isValidMoveFromHome(int diceRoll){
-        Space move = new Space(HOME);  // make a temporary space
-        Space futureMoveLocation = fetechNextSpace(move, diceRoll);
-        if(futureMoveLocation.equals(ERROR)){
-            System.out.println("You cannot move " + diceRoll + " space from " + HOME.getPiece());
-        }
-        if (!futureMoveLocation.equals(HOME) && futureMoveLocation.getOwner().equals( getCurrentPlayerSymbol(playerOne)) ) {
-            System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " already has a piece on " + futureMoveLocation.getPiece().x + " " + futureMoveLocation.getPiece().y + ".");
+        Space move = new Space(HOME);
+        Space futureMoveLocation = fetchNextSpace(move, diceRoll);
+        if (!futureMoveLocation.equals(HOME) && futureMoveLocation.getOwner().equals( getCurrentPlayer(playerOne)) ) {
+            System.out.print("Player " + getCurrentPlayer(playerOne) + " already has a piece on " + futureMoveLocation.getPiece().x + " " + futureMoveLocation.getPiece().y + ".");
             System.out.println("Please choose another move.");
             move = Space.NULLSPACE; // TODO find a more obvious way to do this
         } else {
@@ -139,19 +148,26 @@ public class Board {
 
         while (!move.getIsValidMove()) {
 
-            move = promptPlayerForMoveAndValidate(diceRoll, move);
+            String choice = promptPlayerForMove(diceRoll);
+            move = validateMove(diceRoll, move, choice);
 
         }
 
         updateBoard(move, diceRoll);
-        runLastMoveAction(getLastMove().getProperty());
+        runLastMoveAction(getLastMove());
 
     }
 
-    private Space promptPlayerForMoveAndValidate(int diceRoll, Space move)
-    {
-        System.out.println("Player (" + getCurrentPlayerSymbol() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
+    private String promptPlayerForMove(int diceRoll){
+        System.out.println("Player (" + getCurrentPlayer().ordinal() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
         String choice = scanner.next();
+
+        return choice;
+    }
+
+    private Space validateMove(int diceRoll, Space move, String choice)
+    {
+
         if (choice.equalsIgnoreCase("h")) {
             // home
             move = isValidMoveFromHome(diceRoll);
@@ -175,16 +191,20 @@ public class Board {
         return result;
     }
 
-    private void runLastMoveAction(Property property) throws Exception {
-        if (Property.ROLLAGAIN.equals(property)){
-            int diceRoll = rollDice();
-            playerMove(diceRoll);
+    private void runLastMoveAction(Space lastSpace) throws Exception {
+        for(Property property : lastSpace.getProperties())
+        {
+            if (Property.ROLLAGAIN.equals(property)){
+                int diceRoll = rollDice();
+                printBoard();
+                playerMove(diceRoll);
+            }
         }
+
     }
 
     private Space getLastMove(){
-        Space lastMove = new Space();
-        return lastMove;
+        return lastSpace;
     }
 
 
@@ -197,14 +217,14 @@ public class Board {
         int y = scanner.nextInt();
         Space startingSpace = getSpaceFromBoard(new Cord(x,y));
 
-        Space futureMove = fetechNextSpace(startingSpace, diceRoll);
+        Space futureMove = fetchNextSpace(startingSpace, diceRoll);
         if (!validMove(futureMove)) {
-            System.out.print("Player " + getCurrentPlayerSymbol(playerOne) + " is not allowed to move from " + startingSpace + " to " + futureMove);
+            System.out.print("Player (" + getCurrentPlayer() + ") is not allowed to move from " + startingSpace.getPiece() + " to " + futureMove.getPiece());
             System.out.println("Please choose another move.");
 
         } else {
             if(spaceContainsOtherPlayerPiece(futureMove)){ // TODO this should be removed.
-                System.out.println("You ate piece " + futureMove);
+                System.out.println("You ate piece " + futureMove.getPiece());
             }
             moveTo = startingSpace;
         }
@@ -216,7 +236,7 @@ public class Board {
         if(space.equals(HOME) || space.equals(ERROR) || space.equals(LASTSPACEPLAYERONE) || space.equals(LASTSPACEPLAYERTWO)){
             return false;
         }
-        else if( space.getOwner().equals( getCurrentPlayerSymbol(!playerOne)) ){
+        else if( space.getOwner().equals( getCurrentPlayer(!playerOne)) ){
             return true;
         }
         else {
@@ -224,7 +244,7 @@ public class Board {
         }
     }
 
-    private boolean validMove(Space futureMove) { // TODO remove this method. i dont think its needed anymore
+    private boolean validMove(Space futureMove) {
 
         if( futureMove.equals(END)){
             return true;
@@ -232,9 +252,13 @@ public class Board {
         else if (futureMove.equals(ERROR)) {
             return false;
         }
-        else if (futureMove.getOwner().equals(getCurrentPlayerSymbol(playerOne))) {
+        else if (futureMove.getOwner().equals(getCurrentPlayer(playerOne))) {
             return false;
-        } else {
+        }
+        else if(futureMove.getOwner().equals(getCurrentPlayer(!playerOne)) && futureMove.getProperties().contains(Property.IMMUNITY) ){
+            return false;
+        }
+        else {
             return true;
         }
 
@@ -245,7 +269,7 @@ public class Board {
 
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
-                if (board[i][j].getOwner() == getCurrentPlayerSymbol(playerOne)) {
+                if (board[i][j].getOwner() == getCurrentPlayer(playerOne)) {
                     result += "(" + board[i][j].getPiece().x + " " + board[i][j].getPiece().y + ")";
                 }
             }
@@ -356,10 +380,10 @@ public class Board {
         return getSpaceFromBoard(cur);
     }
 
-    public Player getCurrentPlayerSymbol() {
-        return getCurrentPlayerSymbol(playerOne);
+    public Player getCurrentPlayer() {
+        return getCurrentPlayer(playerOne);
     }
-    public Player getCurrentPlayerSymbol(boolean playerOne) {
+    public Player getCurrentPlayer(boolean playerOne) {
         if (playerOne) {
             return Player.PLAYERONE;
         } else {
@@ -367,7 +391,7 @@ public class Board {
         }
     }
 
-    public Space fetechNextSpace(Space fromSpace, int diceRoll) {
+    public Space fetchNextSpace(Space fromSpace, int diceRoll) {
         Space moveTo = fromSpace;
         try {
             for (int i = 0; i < diceRoll; ++i) {
@@ -410,24 +434,23 @@ public class Board {
         }
 
         Space newSpace = new Space(startingSpace);
-        newSpace = fetechNextSpace(newSpace, diceRoll);
+        newSpace = fetchNextSpace(newSpace, diceRoll);
         removePlayerFromSpace(startingSpace);
-        if(newSpace.equals(END))
-        {
-            promptHome();
-        } else {
-            newSpace.setOwner( getCurrentPlayerSymbol(playerOne) );
-        }
+        setLastMove(newSpace);
+        promptHome(newSpace.equals(END));
+        setOwner(newSpace, getCurrentPlayer());
 
     }
 
+    private void setOwner(Space space, Player player)
+    {
+        if(space.equals(HOME) || space.equals(END)) { return; }
+
+        space.setOwner(player);
+    }
     public void removePlayerFromSpace(Space space)
     {
-        if(space == null )
-        {
-            return;
-        }
-        if(!space.equals(HOME))
+        if(!space.equals(HOME) || !space.equals(END))
         {
             space.setOwner(Player.NOPLAYER);
         }
@@ -438,13 +461,15 @@ public class Board {
         System.out.println("Player 2: " + playerTwoPoints);
     }
 
-    private void promptHome() {
-        if (playerOne) {
-            ++playerOnePoints;
-        } else {
-            ++playerTwoPoints;
+    private void promptHome(boolean act) {
+        if(act){
+            if (playerOne) {
+                ++playerOnePoints;
+            } else {
+                ++playerTwoPoints;
+            }
+            System.out.println(getCurrentPlayer(playerOne) + " made a piece home !");
         }
-        System.out.println(getCurrentPlayerSymbol(playerOne) + " made a piece home !");
     }
 
     private boolean isHome(Space moveTo) {

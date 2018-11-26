@@ -1,5 +1,9 @@
 package com.company.paul;
 
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 public class Space {
@@ -7,16 +11,36 @@ public class Space {
     public static final Space NULLSPACE = new Space();
     private boolean isValidMove;
     private Cord piece;
-    private Property property;
+    private ArrayList<Property> properties;
     private Player owner;
 
     public Space(Space cp) {
         this.isValidMove = cp.getIsValidMove();
         this.piece = new Cord(cp.getPiece());
-        this.property = cp.getProperty();
+        setProperties(cp.getProperties());
         this.owner = cp.getOwner();
     }
 
+    public Space(Player owner) {
+        this.owner = owner;
+        isValidMove = true;
+        piece = null;
+        setProperty(Property.NONE);
+    }
+
+    public Space(Cord cord, Player _owner, boolean _isValidMove) {
+        piece = cord;
+        isValidMove = _isValidMove;
+        setProperty(Property.NONE);
+        owner = _owner;
+    }
+
+    public Space() {
+        isValidMove = false;
+        piece = null;
+        setProperty(Property.NONE);
+        owner = Player.NULLSPACE;
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -24,35 +48,37 @@ public class Space {
         Space space = (Space) o;
         return isValidMove == space.isValidMove &&
                 Objects.equals(piece, space.piece) &&
-                property == space.property &&
+                properties == space.properties &&
                 owner == space.owner;
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(isValidMove, piece, property, owner);
+        return Objects.hash(isValidMove, piece, properties, owner);
     }
 
-    public Space(Player owner) {
-        this.owner = owner;
-        isValidMove = true;
-        piece = null;
-        property = Property.NONE;
+    public ArrayList<Property> getProperties() {
+        return properties;
     }
 
-    public Space(Cord cord, Player _owner, boolean _isValidMove) {
-        piece = cord;
-        isValidMove = _isValidMove;
-        property = Property.NONE;
-        owner = _owner;
+    public void setProperties(ArrayList<Property> properties) {
+        this.properties = new ArrayList<>(properties);
     }
 
-    public Space() {
-        isValidMove = false;
-        piece = null;
-        property = Property.NONE;
-        owner = Player.NULLSPACE;
+    public void setProperty(Property property){
+        properties = new ArrayList<>(Collections.singletonList(property));
+    }
+
+    public void addProperty(Property property)
+    {
+        properties.remove(Property.NONE);
+        properties.add(property);
+    }
+
+
+    public void removeProperty(Property property){
+        properties.remove(property);
     }
 
     public boolean isValidMove() {
@@ -63,10 +89,6 @@ public class Space {
         isValidMove = validMove;
     }
 
-    public void setProperty(Property property) {
-        this.property = property;
-    }
-
     public Player getOwner() {
         return owner;
     }
@@ -75,9 +97,6 @@ public class Space {
         this.owner = owner;
     }
 
-    public Property getProperty(){
-        return  property;
-    }
 
     public void setIsValidMove(boolean b) {
         isValidMove = b;

@@ -1,8 +1,9 @@
 package com.company.paul;
 
 public enum Player {
-    PLAYERONE,
-    PLAYERTWO,
-    NOPLAYER,
-    NULLSPACE
+    NOPLAYER ,
+    PLAYERONE ,
+    PLAYERTWO ,
+    NULLSPACE ;
+
 }
