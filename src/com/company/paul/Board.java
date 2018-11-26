@@ -127,33 +127,41 @@ public class Board {
         return move;
 
     }
+    /*
+     * player needs to choose a piece to move
+     * Options:
+     *   home
+     *   board
+     */
     public void playerMove(int diceRoll) throws Exception {
-        /*
-         * player needs to choose a piece to move
-         * Options:
-         *   home
-         *   board
-         */
+
         Space move = Space.NULLSPACE;
 
         while (!move.getIsValidMove()) {
-            System.out.println("Player (" + getCurrentPlayerSymbol() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
-            String choice = scanner.next();
-            if (choice.equalsIgnoreCase("h")) {
-                // home
-                move = isValidMoveFromHome(diceRoll);
 
-            } else if (choice.equalsIgnoreCase("p")) {
-                // move previous piece
-                move = isValidMoveFromSpace(diceRoll);
-
-            }
+            move = promptPlayerForMoveAndValidate(diceRoll, move);
 
         }
 
         updateBoard(move, diceRoll);
         runLastMoveAction(getLastMove().getProperty());
 
+    }
+
+    private Space promptPlayerForMoveAndValidate(int diceRoll, Space move)
+    {
+        System.out.println("Player (" + getCurrentPlayerSymbol() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
+        String choice = scanner.next();
+        if (choice.equalsIgnoreCase("h")) {
+            // home
+            move = isValidMoveFromHome(diceRoll);
+
+        } else if (choice.equalsIgnoreCase("p")) {
+            // move previous piece
+            move = isValidMoveFromSpace(diceRoll);
+
+        }
+        return move;
     }
 
     public int rollDice(){
@@ -167,11 +175,11 @@ public class Board {
         return result;
     }
 
-    private void runLastMoveAction(Space.Property property) throws Exception {
-//        if (Space.Property.ROLLAGAIN.equals(property)){
-//            int diceRoll = rollDice();
-//            playerMove(diceRoll);
-//        }
+    private void runLastMoveAction(Property property) throws Exception {
+        if (Property.ROLLAGAIN.equals(property)){
+            int diceRoll = rollDice();
+            playerMove(diceRoll);
+        }
     }
 
     private Space getLastMove(){
@@ -187,7 +195,7 @@ public class Board {
         System.out.println("You have peices on " + getListOfActivePieces());
         int x = scanner.nextInt();
         int y = scanner.nextInt();
-        Space startingSpace = getSpace(new Cord(x,y));
+        Space startingSpace = getSpaceFromBoard(new Cord(x,y));
 
         Space futureMove = fetechNextSpace(startingSpace, diceRoll);
         if (!validMove(futureMove)) {
@@ -345,7 +353,7 @@ public class Board {
         } else {
             throw new Exception("nextSpace else case encountered: playerOne = " + playerOne);
         }
-        return getSpace(cur);
+        return getSpaceFromBoard(cur);
     }
 
     public Player getCurrentPlayerSymbol() {
@@ -373,13 +381,12 @@ public class Board {
         return moveTo;
     }
 
-
     private void setLastMove(Space space)
     {
         lastSpace = space;
     }
 
-    public Space getSpace(Cord cord){
+    public Space getSpaceFromBoard(Cord cord){
         Space space = null;
 
         for(int i = 0; i < board.length; ++i){
@@ -396,33 +403,33 @@ public class Board {
 
         return space;
     }
-    public void updateBoard(Space startingSpace, int diceRoll) throws Exception {
+    private void updateBoard(Space startingSpace, int diceRoll) {
         if (diceRoll == 0) {
             setLastMove(Space.NULLSPACE);
             return;
         }
 
         Space newSpace = new Space(startingSpace);
-
-        if (newSpace.equals(HOME)) {
-            // evaluate solution coordinate
-            for (int i = 0; i < diceRoll; ++i) {
-                newSpace = nextSpace(newSpace);
-            }
-            newSpace = getSpace(newSpace.getPiece());
-            newSpace.setOwner( getCurrentPlayerSymbol(playerOne) );
-            setLastMove(newSpace);
+        newSpace = fetechNextSpace(newSpace, diceRoll);
+        removePlayerFromSpace(startingSpace);
+        if(newSpace.equals(END))
+        {
+            promptHome();
         } else {
-            // move a piece that already exist
-            for (int i = 0; i < diceRoll; ++i) {
-                newSpace = nextSpace(newSpace);
-            }
-            if (isHome(newSpace)) {
-                promptHome();
-            } else {
-                newSpace.setOwner( getCurrentPlayerSymbol(playerOne) );
-            }
-            startingSpace.setOwner(Player.NOPLAYER);
+            newSpace.setOwner( getCurrentPlayerSymbol(playerOne) );
+        }
+
+    }
+
+    public void removePlayerFromSpace(Space space)
+    {
+        if(space == null )
+        {
+            return;
+        }
+        if(!space.equals(HOME))
+        {
+            space.setOwner(Player.NOPLAYER);
         }
     }
 

@@ -79,11 +79,6 @@ public class Space {
         return  property;
     }
 
-    public enum Property {
-        ROLLAGAIN,
-        NONE
-    }
-
     public void setIsValidMove(boolean b) {
         isValidMove = b;
     }
