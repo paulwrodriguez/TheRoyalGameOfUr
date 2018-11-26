@@ -6,23 +6,17 @@ import java.util.Scanner;
 
 public class UrGame {
 
-    Board board;
-    static Scanner scanner = new Scanner(System.in);
+    private Board board;
+    private static Scanner scanner = new Scanner(System.in);
 
     public UrGame(){
         board = new Board();
     }
 
-    public String prompt()
-    {
-        System.out.println("Continue? Y/N" );
-        return scanner.next();
-    }
-
     public void play() throws Exception {
 
         while( !board.isGameOver() ) {
-            printBoard();
+            board.printBoard();
             int diceRoll = board.rollDice();
             board.printPlayerPoints();
             board.playerMove(diceRoll);
@@ -36,8 +30,4 @@ public class UrGame {
         System.out.println("The winner is " + board.getWinner() + "!!!!!");
     }
 
-    public void printBoard(){
-        board.printBoard();
-        System.out.println("");
-    }
 }

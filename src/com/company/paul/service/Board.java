@@ -27,7 +27,7 @@ public class Board {
 
     private int playerOnePoints = 0;
     private int playerTwoPoints = 0;
-    Space lastSpace = null;
+    private Space lastSpace = null;
 
     private static final int WINPOINTS = 2;
 
@@ -84,7 +84,7 @@ public class Board {
         }
     }
 
-    List<String> solution = Arrays.asList(
+    private List<String> solution = Arrays.asList(
             "|0,0 |0,1 |0,2 |",
             "|1,0 |1,1 |1,2 |",
             "|2,0 |2,1 |2,2 |",
