@@ -1,8 +1,8 @@
-package com.company.paul;
+package com.company.paul.service.auxilary;
 
-class Cord {
-    int x;
-    int y;
+public class Cord {
+    public int x;
+    public int y;
 
     public Cord(int _x, int _y) {
         x = _x;

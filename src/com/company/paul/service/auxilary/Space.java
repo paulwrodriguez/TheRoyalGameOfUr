@@ -1,8 +1,7 @@
-package com.company.paul;
+package com.company.paul.service.auxilary;
 
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 

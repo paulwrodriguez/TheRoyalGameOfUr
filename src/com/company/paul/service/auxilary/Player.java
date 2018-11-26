@@ -1,4 +1,4 @@
-package com.company.paul;
+package com.company.paul.service.auxilary;
 
 public enum Player {
     NOPLAYER ,
