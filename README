@@ -5,16 +5,14 @@ Game Simulation
 Rules:
     https://www.mastersofgames.com/rules/royal-ur-rules.htm
 
-
-Parts
+Parts:
 * Board (3 x 8)
 * Player
 * Pieces
 * Spaces
 * Dice
 
-
-Board Key
+Board Key:
 (x,y)
 xy y y
 x
@@ -29,7 +27,7 @@ x
 |6,0 |6,1 |6,2 |
 |7,0 |7,1 |7,2 |
 
-Special Squares
+Special Squares:
 * Re-Roll Squares Player 1
     * 0,0
     * 6,0
@@ -41,7 +39,7 @@ Special Squares
 * Immunity Squares
     * 3,1
 
-Features
+Features:
 * fixed bug where player one home having '|' appended to it
 * added joptionpane for game console.
 * add special spaces
@@ -57,13 +55,8 @@ Features
 * add error checking for space
 
 
-TODO
+TODO:
 * add money to determine winner? or possibly to not determine winner.
 * add feature to toggle joption pane
 * error check input
 * add number mapping of the spaces 1 - 14
-
-
-
-
-
