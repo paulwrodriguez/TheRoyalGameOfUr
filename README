@@ -16,6 +16,8 @@ TODO
 
 
 Features
+* fixed bug where player one home having '|' appended to it
+* added joptionpane for game console.
 * add special spaces
 * home should be 4 0 and end should be 5 0 for player one.
 * home should be 4 2 and end should be 5 2 for player two

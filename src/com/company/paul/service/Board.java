@@ -6,7 +6,10 @@ import com.company.paul.service.auxilary.Player;
 import com.company.paul.service.auxilary.Property;
 import com.company.paul.service.auxilary.Space;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class Board {
 
@@ -28,10 +31,12 @@ public class Board {
     private int playerOnePoints = 0;
     private int playerTwoPoints = 0;
     private Space lastSpace = null;
+    private String output;
 
     private static final int WINPOINTS = 2;
 
     public Board() {
+        output = "";
         ERROR = new Space(new Cord(-3, -3), Player.NOPLAYER, false);
         LASTSPACEPLAYERONE = new Space( new Cord(6, 0), Player.NOPLAYER , true);
         LASTSPACEPLAYERTWO = new Space( new Cord(6, 2), Player.NOPLAYER , true);
@@ -66,9 +71,6 @@ public class Board {
         board[3][1].setProperty(Property.ROLLAGAIN);
         board[3][1].addProperty(Property.IMMUNITY);
 
-
-
-
     }
 
     public void nextPlayer() {
@@ -94,45 +96,56 @@ public class Board {
             "|6,0 |6,1 |6,2 |",
             "|7,0 |7,1 |7,2 |");
 
+    private void addToStream(String m){
+        output += m;
+        System.out.print(m);
+    }
+    private void addToStreamln(String m) {
+        output = output + m + "\n";
+        System.out.println(m);
+    }
+
     public void printBoard() {
-        System.out.println("-------------------------------------------");
+
+        addToStreamln("-------------------------------------------");
         for (int i = 0; i < board.length; ++i) {
             for (int j = 0; j < board[i].length; ++j) {
                 switch (board[i][j].getOwner()) {
                     case NULLSPACE:
                         if (j == 2) {
-                            System.out.print("| ");
+                            addToStream("| ");
                         } else {
-                            System.out.print("  ");
+                            addToStream("  ");
                         }
                         break;
                     case NOPLAYER:
-                        System.out.print("| ");
+                        addToStream("| ");
                         break;
                     case PLAYERONE:
-                        System.out.print("|X");
+                        addToStream("|X");
                         break;
                     case PLAYERTWO:
-                        System.out.print("|O");
+                        addToStream("|O");
                 }
             }
             if (board[i][2].getOwner() == Player.NULLSPACE) {
-                System.out.print("");
+                addToStream("");
             } else {
-                System.out.print("| ");
+                addToStream("| ");
             }
 
-            System.out.println("       " + solution.get(i));
+            addToStreamln("       " + solution.get(i));
 
         }
+        addToStreamln("-------------------------------------------");
     }
 
     public Space isValidMoveFromHome(int diceRoll){
         Space move = new Space(HOME);
         Space futureMoveLocation = fetchNextSpace(move, diceRoll);
         if (!futureMoveLocation.equals(HOME) && futureMoveLocation.getOwner().equals( getCurrentPlayer(playerOne)) ) {
-            System.out.print("Player " + getCurrentPlayer(playerOne) + " already has a piece on " + futureMoveLocation.getPiece().x + " " + futureMoveLocation.getPiece().y + ".");
-            System.out.println("Please choose another move.");
+            addToStream("Player " + getCurrentPlayer(playerOne) + " already has a piece on " + futureMoveLocation.getPiece().x + " " + futureMoveLocation.getPiece().y + ".");
+            addToStreamln("Please choose another move.");
             move = Space.NULLSPACE; // TODO find a more obvious way to do this
         } else {
             move = HOME; // TODO might not be needed since frech doesnt change the passed value.
@@ -164,8 +177,36 @@ public class Board {
     }
 
     private String promptPlayerForMove(int diceRoll){
-        System.out.println("Player (" + getCurrentPlayer().ordinal() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
-        String choice = scanner.next();
+        addToStreamln("Player (" + getCurrentPlayer().ordinal() + ") rolled a (" + diceRoll + "). Move home(h) or move piece(p)");
+        String choice;
+//        String choice = scanner.next();
+
+        List<String> options = Arrays.asList("Home(h)", "Piece (p)");
+
+        UIManager.put("OptionPane.messageFont", new Font("Monospaced", Font.PLAIN, 30));
+        JFrame frame = new JFrame();
+        int n = JOptionPane.showOptionDialog(frame,
+                output,
+                "UR Game",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options.toArray(),
+                options.toArray()[0]);
+
+        System.out.println(output);
+        output = "";
+
+        if(n == 0){
+            choice = "h";
+        }
+        else if( n == 1)
+        {
+            choice = "p";
+        }
+        else {
+            choice = "";
+        }
 
         return choice;
     }
@@ -213,23 +254,45 @@ public class Board {
     }
 
 
+    private int[] getIntFromConsole()
+    {
+        String choice;
+
+        List<String> options = Arrays.asList("Home(h)", "Piece (p)");
+
+        UIManager.put("OptionPane.messageFont", new Font("Monospaced", Font.PLAIN, 30));
+        JFrame frame = new JFrame();
+        String n = JOptionPane.showInputDialog(output);
+        System.out.println(output);
+
+        String[] stringArray = n.trim().split("\\s+");
+
+        int[] result = new int[2];
+        result[0] = Integer.parseInt(stringArray[0]);
+        result[1] = Integer.parseInt(stringArray[1]);
+
+        output = "";
+        return result;
+    }
     private Space isValidMoveFromSpace(int diceRoll) {
         Space moveTo = ERROR;
 
-        System.out.println("Which piece do you want to move? {x y}");
-        System.out.println("You have peices on " + getListOfActivePieces());
-        int x = scanner.nextInt();
-        int y = scanner.nextInt();
+        addToStreamln("Which piece do you want to move? {x y}");
+        addToStreamln("You have peices on " + getListOfActivePieces());
+
+        int[] result = getIntFromConsole();
+        int x = result[0];
+        int y = result[1];
         Space startingSpace = getSpaceFromBoard(new Cord(x,y));
 
         Space futureMove = fetchNextSpace(startingSpace, diceRoll);
         if (!validMove(futureMove)) {
-            System.out.print("Player (" + getCurrentPlayer() + ") is not allowed to move from " + startingSpace.getPiece() + " to " + futureMove.getPiece());
-            System.out.println("Please choose another move.");
+            addToStream("Player (" + getCurrentPlayer() + ") is not allowed to move from " + startingSpace.getPiece() + " to " + futureMove.getPiece());
+            addToStreamln("Please choose another move.");
 
         } else {
             if(spaceContainsOtherPlayerPiece(futureMove)){ // TODO this should be removed.
-                System.out.println("You ate piece " + futureMove.getPiece());
+                addToStreamln("You ate piece " + futureMove.getPiece());
             }
             moveTo = startingSpace;
         }
@@ -404,7 +467,7 @@ public class Board {
             }
         } catch (Exception e) {
             moveTo = ERROR;
-            System.out.println(e.getMessage());
+            addToStreamln(e.getMessage());
         }
 
         return moveTo;
@@ -455,15 +518,15 @@ public class Board {
     }
     public void removePlayerFromSpace(Space space)
     {
-        if(!space.equals(HOME) || !space.equals(END))
+        if(!(space.equals(HOME) || space.equals(END)))
         {
             space.setOwner(Player.NOPLAYER);
         }
     }
 
     public void printPlayerPoints() {
-        System.out.println("Player 1: " + playerOnePoints);
-        System.out.println("Player 2: " + playerTwoPoints);
+        addToStreamln("Player 1: " + playerOnePoints);
+        addToStreamln("Player 2: " + playerTwoPoints);
     }
 
     private void promptHome(boolean act) {
@@ -473,7 +536,7 @@ public class Board {
             } else {
                 ++playerTwoPoints;
             }
-            System.out.println(getCurrentPlayer(playerOne) + " made a piece home !");
+            addToStreamln(getCurrentPlayer(playerOne) + " made a piece home !");
         }
     }
 
