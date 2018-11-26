@@ -10,10 +10,11 @@ Parts
 * Dice
 
 TODO
+
 * error check input
 * add number mapping of the spaces 1 - 14
 * add special spaces
-* add output that shows that you ate someones piece.
+
 
 Features
 * add validation for end game. exactly landing on home square
@@ -22,6 +23,10 @@ Features
 * remove prompt to continue playing. exit on winner
 * add key to board print out
 * add error checking for space
+* home should be 4 0 and end should be 5 0 for player one.
+* home should be 4 2 and end should be 5 2 for player two
+* add output that shows that you ate someones piece.
+* updated board interface.
 
 Board Key
 (x,y)

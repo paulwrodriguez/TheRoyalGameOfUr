@@ -20,30 +20,19 @@ public class UrGame {
 
     public void play() throws Exception {
 
-        printBoard();
         while( !board.isGameOver() ) {
-            int diceRoll = rollDice();
+            printBoard();
+            int diceRoll = board.rollDice();
             board.printPlayerPoints();
             board.playerMove(diceRoll);
             board.nextPlayer();
-            printBoard();
+
         }
         printWinner();
     }
 
     private void printWinner(){
         System.out.println("The winner is " + board.getWinner() + "!!!!!");
-    }
-
-    public int rollDice(){
-        Random random = new Random();
-        int d1 = random.nextInt(2);
-        int d2 = random.nextInt(2);
-        int d3 = random.nextInt(2);
-        int d4 = random.nextInt(2);
-
-        int result = d1 + d2 + d3 + d4;
-        return result;
     }
 
     public void printBoard(){
