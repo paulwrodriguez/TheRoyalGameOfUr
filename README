@@ -40,6 +40,7 @@ Special Squares:
     * 3,1
 
 Features:
+* added config class for output method
 * fixed bug where player one home having '|' appended to it
 * added joptionpane for game console.
 * add special spaces
