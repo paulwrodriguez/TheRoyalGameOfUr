@@ -1,7 +1,7 @@
 package com.company.paul.controller;
 
 import com.company.paul.service.Board;
-import com.company.paul.service.auxilary.Config;
+import com.company.paul.config.Config;
 
 import javax.swing.*;
 import java.awt.*;
